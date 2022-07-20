@@ -56,12 +56,16 @@ class Database(
 
         self._collection_cache = {}
 
-    # TODO: add attribute access to collections
-    # def __getattribute__(self, __name: str, /) -> Any:
-    #     ...
+    def __getattr__(self, name: str) -> "Collection":
+        if name.startswith("_"):
+            raise AttributeError(
+                "Database has no attribute %r. To access the %s"
+                " collection, use database[%r]." % (name, name, name)
+            )
+        return self.__getitem__(name)
 
-    def __getitem__(self, __k: str, /) -> Collection:
-        return self.get_collection(__k)
+    def __getitem__(self, name: str) -> "Collection":
+        return self.get_collection(self, name)
 
     @with_doc_and_sig(_Database.get_collection)
     def get_collection(  # pylint: disable=missing-docstring

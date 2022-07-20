@@ -70,11 +70,31 @@ class Collection(
     def api_endpoint_url(self) -> str:
         return self.database.api_endpoint_url
 
-    # c[name] || c.name
+    # def __getattr__(self, name: str) -> "Collection":
+    #     """Get a sub-collection of this collection by name.
+    #     Raises InvalidName if an invalid collection name is used.
+    #     :Parameters:
+    #       - `name`: the name of the collection to get
+    #     """
+    #     if name.startswith("_"):
+    #         full_name = "%s.%s" % (self.__name, name)
+    #         raise AttributeError(
+    #             "Collection has no attribute %r. To access the %s"
+    #             " collection, use database['%s']."
+    #             % (name, full_name, full_name)
+    #         )
+    #     return self.__getitem__(name)
 
-    # Get the name sub-collection of Collection c.
-
-    # Raises InvalidName if an invalid collection name is used.
+    # def __getitem__(self, name: str) -> "Collection":
+    #     return Collection(
+    #         self._database,
+    #         "%s.%s" % (self.__name, name),
+    #         False,
+    #         self.codec_options,
+    #         self.read_preference,
+    #         self.write_concern,
+    #         self.read_concern,
+    #     )
 
     @property
     def name(self) -> str:

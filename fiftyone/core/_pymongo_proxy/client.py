@@ -3,6 +3,7 @@
 | `voxel51.com <https://voxel51.com/>`_
 |
 """
+import base64
 from typing import Any
 
 from pymongo import MongoClient as _MongoClient
@@ -38,9 +39,9 @@ class Client(
 ):
     """Proxy class for pymongo.MongoClient"""
 
-    def __init__(self, api_endpoint_url: str):
+    def __init__(self, api_endpoint_url: str, access_key: str):
         self._api_endpoint_url = api_endpoint_url
-
+        self._access_key = access_key
         self._closed = False
         self._database_cache = {}
 
@@ -48,9 +49,23 @@ class Client(
     def api_endpoint_url(self) -> str:
         return self._api_endpoint_url
 
-    # TODO: add attribute access to databases
-    # def __getattribute__(self, __name: str, /):
-    #     ...
+    @property
+    def api_endpoint_headers(self) -> dict[str, Any]:
+        if self._access_key:
+            key = base64.b64encode(self._access_key).decode()
+        return {"Authorization": f"Basic :{key}"}
+        return {}
+
+    def __getattr__(self, name: str) -> "Database":
+        if name.startswith("_"):
+            raise AttributeError(
+                "Client has no attribute %r. To access the %s"
+                " database, use client[%r]." % (name, name, name)
+            )
+        return self.__getitem__(name)
+
+    def __getitem__(self, name: str) -> "Database":
+        return self.get_database(self, name)
 
     def close(self) -> None:
         self._closed = True

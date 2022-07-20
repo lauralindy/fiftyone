@@ -111,6 +111,11 @@ class _PymongoAPIBase(abc.ABC):
     def api_endpoint_url(self) -> str:
         """Endpoint of server"""
 
+    @property
+    def api_endpoint_headers(self) -> dict[str, Any]:
+        """Headers to pass to the server"""
+        return {}
+
     @staticmethod
     def serialize_for_request(value: Any):
         return bson.json_util.dumps(value)
@@ -134,7 +139,9 @@ class _PymongoAPIBase(abc.ABC):
 
     def _request(self, payload: dict[str, Any]) -> Any:
         response = requests.post(
-            url=self.api_endpoint_url, data=json.dumps(payload)
+            url=self.api_endpoint_url,
+            headers=self.api_endpoint_headers,
+            data=json.dumps(payload),
         )
         try:
             response.raise_for_status()
@@ -180,7 +187,9 @@ class PymongoAPIBase(_PymongoAPIBase, abc.ABC):
 class PymongoWSBase(_PymongoAPIBase, abc.ABC):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._ws = websocket.create_connection(self.api_endpoint_url)
+        self._ws = websocket.create_connection(
+            self.api_endpoint_url, header=self.api_endpoint_headers
+        )
         self._closed = False
 
     def __iter__(self):
