@@ -9,6 +9,7 @@ from .aggregate import Aggregate
 from .aggregations import Aggregations
 from .colorscales import Colorscales
 from .distributions import Distributions
+from .embeddings import Embeddings
 from .event import Event
 from .events import Events
 from .fiftyone import FiftyOne
@@ -31,6 +32,7 @@ routes = [
     ("/aggregations", Aggregations),
     ("/coloscales", Colorscales),
     ("/distributions", Distributions),
+    ("/embeddings", Embeddings),
     ("/event", Event),
     ("/events", Events),
     ("/fiftyone", FiftyOne),
